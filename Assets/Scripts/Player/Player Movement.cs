@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.Animations;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -15,9 +16,12 @@ public class PlayerMovement : MonoBehaviour
     public bool Grounded;
 
     // Public bools to make animation parameters
+    private Animator Animator;
+    //public AnimatorController controller;
     public bool Walking; 
     public bool Sprinting;
     public bool Jumping;
+
 
     public PlayerData PlayerData; // Reference to scriptable object
 
@@ -25,6 +29,7 @@ public class PlayerMovement : MonoBehaviour
     void Start() //Setting objects from scene when starting
     {
         rb = GetComponent<Rigidbody>();
+        Animator = GetComponent<Animator>();
     }
 
 
@@ -52,16 +57,22 @@ public class PlayerMovement : MonoBehaviour
         {
             Walking = true;
             Sprinting = false;
+            Animator.SetBool("Walking", Walking);
+            Animator.SetBool("Running", Sprinting);
         }
         else if (rb.velocity.magnitude >= PlayerData.SprintLimit)
         {
             Sprinting = true;
             Walking = false;
+            Animator.SetBool("Walking", Walking);
+            Animator.SetBool("Running", Sprinting);
         }
         else
         {
             Walking = false;
             Sprinting = false;
+            Animator.SetBool("Walking", Walking);
+            Animator.SetBool("Running", Sprinting);
         }
     }
     
