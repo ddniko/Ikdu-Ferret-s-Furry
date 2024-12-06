@@ -13,8 +13,13 @@ public class PlayerData : ScriptableObject
     public float WalkSpeed;
     public float SprintSpeed;
     public float SprintLimit;
-    public float JumpForce;
-    public float JumpUpForce;
+    public float DodgeForce;
+    public float DodgeCD;
 
+    [Space(2)]
+
+    [Header("Combat")]
+    public float AttackCD;
+    public float AttackSequence;
 
 }

@@ -12,7 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc117485298f5bf4d9bb0d2df6b0d0d1, type: 3}
   m_Name: PlayerData
   m_EditorClassIdentifier: 
-  WalkSpeed: 10
-  SprintSpeed: 20
+  WalkSpeed: 7
+  SprintSpeed: 10
   SprintLimit: 10
-  JumpForce: 0
+  DodgeForce: 15
+  DodgeCD: 3
+  AttackCD: 0
+  AttackSequence: 0
