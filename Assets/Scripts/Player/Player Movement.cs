@@ -12,7 +12,6 @@ public class PlayerMovement : MonoBehaviour
     private float Horizontal;
     private float Vertical;
     private Vector3 MoveDir;
-    private Vector3 DodgeDir;
     private bool Sprint;
 
     private float AttackTimer;
