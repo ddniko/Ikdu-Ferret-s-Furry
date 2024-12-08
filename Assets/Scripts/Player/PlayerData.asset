@@ -18,4 +18,4 @@ MonoBehaviour:
   DodgeForce: 15
   DodgeCD: 3
   AttackCD: 0
-  AttackSequence: 0
+  AttackSequence: 0.9

@@ -19,7 +19,7 @@ public class PlayerMovement : MonoBehaviour
     private float DodgeTimer;
 
     private Animator Animator;
-    public bool Walking, Sprinting, Jumping, Grounded, Dodging, Attacking; 
+    public bool Walking, Sprinting, Jumping, Grounded, Dodging, Attacking, Sequence; 
 
     public PlayerData PlayerData; //Reference to scriptable object
 
@@ -66,9 +66,15 @@ public class PlayerMovement : MonoBehaviour
                 {
                     Debug.Log("Hit Ground");
                     transform.rotation = Quaternion.LookRotation(hit.point, Vector3.up);
-                    StartCoroutine(Attack());
+                    SequenceTimer = 0; //CHANGE
                 }
             }
+        }
+
+        if(SequenceTimer <= PlayerData.AttackSequence && !Attacking) //CHANGE
+        {
+            StartCoroutine("Attack1");
+            Debug.Log("why you do smth");
         }
 
 
@@ -128,17 +134,69 @@ public class PlayerMovement : MonoBehaviour
         Debug.Log("Rolling end");
     }
 
-    private IEnumerator Attack()
+    private IEnumerator Attack1()
     {
         Attacking = true;
         Debug.Log("Attack Start");
         Animator.SetBool("Attacking", Attacking);
+
+
+        //StopCoroutine("Attack1");
+        Debug.Log("Didn't stop");
+        //Åben hit area
+
         yield return new WaitForSeconds(1);
-        if (Input.GetMouseButton(0)) //Mangler rigtig måde at få sequence attacks
+
+        //Luk hit area
+
+        if (SequenceTimer < PlayerData.AttackSequence) //CHANGE  //Mangler rigtig måde at få sequence attacks
         {
             Debug.Log("Attack2 start");
+            StartCoroutine(Attack2());
+            StopCoroutine("Attack1");
         }
+        Debug.Log("notattack2");
         Attacking = false;
+        Animator.SetBool("Attacking", Attacking);
+    }
+
+    private IEnumerator Attack2()
+    {
+
+        //Åben hit area
+
+        yield return new WaitForSeconds(2);
+
+        if (SequenceTimer < PlayerData.AttackSequence) //Mangler rigtig måde at få sequence attacks
+        {
+            //Debug.Log("Attack2 start");
+            StartCoroutine(Attack3());
+            StopCoroutine(Attack2());
+        }
+
+        //Luk hit area
+        Attacking = false;
+        //Animator.SetBool("Attacking", Attacking);
+    }
+
+    private IEnumerator Attack3()
+    {
+
+        //Åben hit area
+
+        yield return new WaitForSeconds(1);
+
+        //Luk hit area
+
+
+        Attacking = false;
+        //Animator.SetBool("Attacking", Attacking);
+
+    }
+
+    private void Attack()
+    {
+
     }
 
 
