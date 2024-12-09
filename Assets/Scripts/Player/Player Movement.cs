@@ -17,6 +17,7 @@ public class PlayerMovement : MonoBehaviour
     private float AttackTimer;
     private float SequenceTimer;
     private float DodgeTimer;
+    private float ComboBuffer;
 
     private Animator Animator;
     public bool Walking, Sprinting, Jumping, Grounded, Dodging, Attacking, Sequence; 
@@ -39,6 +40,7 @@ public class PlayerMovement : MonoBehaviour
         DodgeTimer += Time.deltaTime;
         AttackTimer += Time.deltaTime;
         SequenceTimer += Time.deltaTime;
+        ComboBuffer += Time.deltaTime;
 
         Horizontal = Input.GetAxis("Horizontal"); //Returns 1 or -1 when pressing a or d
         Vertical = Input.GetAxis("Vertical"); //Returns 1 or -1 when pressing w or s
@@ -57,22 +59,22 @@ public class PlayerMovement : MonoBehaviour
             StartCoroutine(DodgeRoll());
         }
 
-        if (Input.GetMouseButtonDown(0)) //casts a ray when you L-click on screen space, and if the ray hits the ground, it makes a point, truning the character towards the point
+        if (Input.GetMouseButtonDown(0) && !Dodging) //casts a ray when you L-click on screen space, and if the ray hits the ground, it makes a point, truning the character towards the point
         {
-            Debug.Log("Click");
+            //Debug.Log("Click");
             Ray MouseInput = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(MouseInput, out RaycastHit hit))
             {
-                Debug.Log("Hit");;
+                //Debug.Log("Hit");;
                 if (hit.collider.gameObject.layer == 6)
                 {
-                    Debug.Log("Hit Ground");
-                    transform.rotation = Quaternion.LookRotation(hit.point, Vector3.up); // Endnu et parameter
-                    SequenceTimer = 0; //CHANGE
+                    //Debug.Log("Hit Ground");
+                    transform.rotation = Quaternion.LookRotation(hit.point, Vector3.up); // Endnu en parameter
+                    SequenceTimer = -PlayerData.AttackSequence; //CHANGE
                 }
             }
         }
-
+        /*
         if (SequenceTimer < PlayerData.AttackSequence && WhatAttack(AttackNum) && !Dodging)
         {
             if (AttackNum == 1)
@@ -87,6 +89,8 @@ public class PlayerMovement : MonoBehaviour
                 Animator.SetBool("Atk" + (AttackNum - 1), false);
             }
             AttackNum++;
+            //AttackNum = Mathf.Clamp(AttackNum,1,3);
+            Debug.Log(AttackNum);
         }
         else if (SequenceTimer > PlayerData.AttackSequence || AttackNum >= 4) //CHANGE den gør ikke attack 3
         {
@@ -94,8 +98,45 @@ public class PlayerMovement : MonoBehaviour
             Animator.SetBool("Atk1",false);
             Animator.SetBool("Atk2", false);
             Animator.SetBool("Atk3", false);
+        }*/
+        /*
+        if (SequenceTimer <= 0 && !IsAttacking())
+        {
+            Attack();
         }
 
+        if (IsAttacking() && Animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 0.7)
+        {
+            ComboBuffer = -PlayerData.ComboBuffer;
+        }
+
+        if (!IsAttacking() && ComboBuffer <= 0)
+        {
+            Animator.SetBool("Atk" + AttackNum, false);
+            AttackNum = 1;
+        }*/
+
+        if (SequenceTimer <= 0 && !Dodging)
+        {
+            Attack();
+            Animator.SetBool("Atk1", true);
+            Animator.SetBool("Atk2", false);
+            Animator.SetBool("Atk3", false);
+        }
+        else if (SequenceTimer <= 0 && !Dodging && Animator.GetCurrentAnimatorStateInfo(0).IsName("Attack1"))
+        {
+            Attack();
+            Animator.SetBool("Atk2", true);
+            Animator.SetBool("Atk1", false);
+            Animator.SetBool("Atk3", false);
+        }
+        else if (SequenceTimer <= 0 && !Dodging && Animator.GetCurrentAnimatorStateInfo(0).IsName("Attack2"))
+        {
+            Attack();
+            Animator.SetBool("Atk3", true);
+            Animator.SetBool("Atk2", false);
+            Animator.SetBool("Atk1", false);
+        }
 
         //Måske læg i script for sig selv
         if (rb.velocity.magnitude >= 0.1 && rb.velocity.magnitude < PlayerData.SprintLimit)
@@ -119,6 +160,8 @@ public class PlayerMovement : MonoBehaviour
             Animator.SetBool("Walking", Walking);
             Animator.SetBool("Running", Sprinting);
         }
+
+        Debug.Log("IsAttacking" + IsAttacking());
     }
     
     private void FixedUpdate() //Everything doing something to a rigidbody, make do it in fixed
@@ -163,12 +206,46 @@ public class PlayerMovement : MonoBehaviour
         {
             if (Animator.GetCurrentAnimatorStateInfo(0).IsName("Attack" + (Num-1)) && Animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 0.7f)
             {
+                Debug.Log("what attack true");
                 return true;
             }
             else
             {
                 return false;
             }
+        }
+    }
+
+    private bool IsAttacking()
+    {
+        if (Animator.GetCurrentAnimatorStateInfo(0).IsName("Attack1") || Animator.GetCurrentAnimatorStateInfo(0).IsName("Attack2") || Animator.GetCurrentAnimatorStateInfo(0).IsName("Attack3"))
+        {
+            /*if (Animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 0.7f)
+            {
+                return false;
+            }*/
+            return true;
+        }
+        return false;
+    }
+
+    private void Attack()
+    {
+        SequenceTimer = 1;
+        if (AttackNum == 3)
+        {
+            Animator.SetBool("Atk" + AttackNum, true);
+            Animator.SetBool("Atk" + (AttackNum - 1), false);
+            AttackNum = 1;
+        }
+        else
+        {
+            Animator.SetBool("Atk" + AttackNum, true);
+            if (AttackNum == 2)
+            {
+                Animator.SetBool("Atk" + (AttackNum - 1), false);
+            }
+            AttackNum++;
         }
     }
 

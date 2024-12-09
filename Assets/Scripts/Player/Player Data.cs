@@ -21,5 +21,6 @@ public class PlayerData : ScriptableObject
     [Header("Combat")]
     public float AttackCD;
     public float AttackSequence;
+    public float ComboBuffer;
 
 }
