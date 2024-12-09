@@ -23,6 +23,8 @@ public class PlayerMovement : MonoBehaviour
 
     public PlayerData PlayerData; //Reference to scriptable object
 
+    private int AttackNum = 1;
+
 
     void Start() //Setting objects from scene when starting
     {
@@ -65,16 +67,33 @@ public class PlayerMovement : MonoBehaviour
                 if (hit.collider.gameObject.layer == 6)
                 {
                     Debug.Log("Hit Ground");
-                    transform.rotation = Quaternion.LookRotation(hit.point, Vector3.up);
+                    transform.rotation = Quaternion.LookRotation(hit.point, Vector3.up); // Endnu et parameter
                     SequenceTimer = 0; //CHANGE
                 }
             }
         }
 
-        if(SequenceTimer <= PlayerData.AttackSequence && !Attacking) //CHANGE
+        if (SequenceTimer < PlayerData.AttackSequence && WhatAttack(AttackNum) && !Dodging)
         {
-            StartCoroutine("Attack1");
-            Debug.Log("why you do smth");
+            if (AttackNum == 1)
+            {
+                Debug.Log("attack1");
+                Animator.SetBool("Atk" + AttackNum, true);
+            }
+            else
+            {
+                Debug.Log("attack" + AttackNum);
+                Animator.SetBool("Atk" + AttackNum, true);
+                Animator.SetBool("Atk" + (AttackNum - 1), false);
+            }
+            AttackNum++;
+        }
+        else if (SequenceTimer > PlayerData.AttackSequence || AttackNum >= 4) //CHANGE den gør ikke attack 3
+        {
+            AttackNum = 1;
+            Animator.SetBool("Atk1",false);
+            Animator.SetBool("Atk2", false);
+            Animator.SetBool("Atk3", false);
         }
 
 
@@ -134,6 +153,34 @@ public class PlayerMovement : MonoBehaviour
         Debug.Log("Rolling end");
     }
 
+    private bool WhatAttack(int Num)
+    {
+        if (Num == 1)
+        {
+            return true;
+        }
+        else
+        {
+            if (Animator.GetCurrentAnimatorStateInfo(0).IsName("Attack" + (Num-1)) && Animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 0.7f)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
+    /*
     private IEnumerator Attack1()
     {
         Attacking = true;
@@ -201,7 +248,7 @@ public class PlayerMovement : MonoBehaviour
 
 
 
-    /*
+    
     private void OnCollisionExit(Collision collision)
     {
         if (collision.gameObject.tag == "Ground")

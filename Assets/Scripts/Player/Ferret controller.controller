@@ -45,6 +45,9 @@ AnimatorStateTransition:
   - m_ConditionMode: 1
     m_ConditionEvent: Attacking
     m_EventTreshold: 0
+  - m_ConditionMode: 1
+    m_ConditionEvent: Atk3
+    m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 645025710694757289}
   m_Solo: 0
@@ -129,7 +132,7 @@ AnimatorStateTransition:
   m_TransitionDuration: 0.25
   m_TransitionOffset: 0
   m_ExitTime: 0.75
-  m_HasExitTime: 1
+  m_HasExitTime: 0
   m_HasFixedDuration: 1
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
@@ -298,6 +301,24 @@ AnimatorController:
     m_DefaultBool: 0
     m_Controller: {fileID: 9100000}
   - m_Name: Attacking
+    m_Type: 4
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
+  - m_Name: Atk1
+    m_Type: 4
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
+  - m_Name: Atk2
+    m_Type: 4
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
+  - m_Name: Atk3
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
@@ -473,6 +494,9 @@ AnimatorStateTransition:
   - m_ConditionMode: 1
     m_ConditionEvent: Attacking
     m_EventTreshold: 0
+  - m_ConditionMode: 1
+    m_ConditionEvent: Atk2
+    m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -2800241325476421550}
   m_Solo: 0
@@ -513,10 +537,10 @@ AnimatorStateMachine:
     m_Position: {x: -460, y: 30, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -2800241325476421550}
-    m_Position: {x: -730, y: 30, z: 0}
+    m_Position: {x: -460, y: 110, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 645025710694757289}
-    m_Position: {x: -730, y: -50, z: 0}
+    m_Position: {x: -460, y: 200, z: 0}
   m_ChildStateMachines: []
   m_AnyStateTransitions:
   - {fileID: -7031409430393486681}
@@ -541,6 +565,9 @@ AnimatorStateTransition:
   m_Conditions:
   - m_ConditionMode: 1
     m_ConditionEvent: Attacking
+    m_EventTreshold: 0
+  - m_ConditionMode: 1
+    m_ConditionEvent: Atk1
     m_EventTreshold: 0
   - m_ConditionMode: 2
     m_ConditionEvent: Dodging
