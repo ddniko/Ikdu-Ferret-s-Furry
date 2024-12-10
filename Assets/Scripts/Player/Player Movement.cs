@@ -53,6 +53,7 @@ public class PlayerMovement : MonoBehaviour
 
         //Checks if you are making a movement input, this makes sure i don't walk and sprint at the same time
         Sprint = Input.GetKey(KeyCode.LeftShift) ? true : false; //These are simplified versions of if-statements where we have "Condition ? consequent : alternative" good for when a if-statement doesn't change much
+        Debug.Log(Sprint);
 
         if (Input.GetKeyDown(KeyCode.Space) && DodgeTimer >= PlayerData.DodgeCD) //tilføj attack og sequence parameter og cooldown
         {
