@@ -191,7 +191,7 @@ public class PlayerMovement : MonoBehaviour
         //something dont take damage
 
         rb.AddForce(transform.forward * PlayerData.DodgeForce, ForceMode.Impulse); //Pushes the character TO BE REMADE WHEN ANIMATION IS DONE
-        yield return new WaitForSeconds(2);//set time to however long the animation takes
+        yield return new WaitForSeconds(1.458f);//set time to however long the animation takes
         Dodging = false;
         Animator.SetBool("Dodging", Dodging);
         Debug.Log("Rolling end");
