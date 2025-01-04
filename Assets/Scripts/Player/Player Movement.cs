@@ -147,8 +147,9 @@ public class PlayerMovement : MonoBehaviour
     }
     private void Attack()
     {
-        transform.rotation = Quaternion.LookRotation(Point.point, Vector3.up);
+        transform.rotation = Quaternion.LookRotation(Point.point-transform.position, Vector3.up);
         Animator.SetBool("Attacking", true);
+        rb.velocity = Vector3.zero;
         Attacking = true;
     }
 
