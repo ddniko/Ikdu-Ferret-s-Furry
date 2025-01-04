@@ -30,6 +30,7 @@ public class PlayerMovement : MonoBehaviour
 
     public GameObject Sword, Staff;
 
+    public LayerMask Ground;
 
 
     void Start() //Setting objects from scene when starting
@@ -68,20 +69,16 @@ public class PlayerMovement : MonoBehaviour
         {
             //Debug.Log("Click");
             Ray MouseInput = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(MouseInput, out RaycastHit hit))
+            if (Physics.Raycast(MouseInput, out RaycastHit hit, Mathf.Infinity, Ground,QueryTriggerInteraction.Collide))
             {
-                //Debug.Log("Hit");;
-                if (hit.collider.gameObject.layer == 6)
+                //Debug.Log("Hit Ground");
+                SequenceTimer = 0;
+                //transform.rotation = Quaternion.LookRotation(hit.point, Vector3.up); // Endnu en parameter
+                Point = hit;
+                if (AttackTimer >= PlayerData.AttackCD)
                 {
-                    //Debug.Log("Hit Ground");
-                    SequenceTimer = 0;
-                    //transform.rotation = Quaternion.LookRotation(hit.point, Vector3.up); // Endnu en parameter
-                    Point = hit;
-                    if (AttackTimer >= PlayerData.AttackCD)
-                    {
-                        Attack();
-                        AttackTimer = 0;
-                    }
+                    Attack();
+                    AttackTimer = 0;
                 }
             }
         }

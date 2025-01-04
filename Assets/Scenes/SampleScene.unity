@@ -166,6 +166,9 @@ MonoBehaviour:
   PlayerData: {fileID: 11400000, guid: f548c6a8583c7fa46a11b23414d19eef, type: 2}
   Sword: {fileID: 0}
   Staff: {fileID: 0}
+  Ground:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!54 &27120103
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -712,6 +715,9 @@ MonoBehaviour:
   PlayerData: {fileID: 11400000, guid: f548c6a8583c7fa46a11b23414d19eef, type: 2}
   Sword: {fileID: 995220852}
   Staff: {fileID: 287880068}
+  Ground:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!54 &1449998830
 Rigidbody:
   m_ObjectHideFlags: 0
