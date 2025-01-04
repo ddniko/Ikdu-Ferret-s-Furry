@@ -65,7 +65,7 @@ ModelImporter:
       name: Ferretv2|Attack2
       takeName: Ferretv2|Attack2
       internalID: -6165587314316539678
-      firstFrame: 0
+      firstFrame: 30
       lastFrame: 45
       wrapMode: 0
       orientationOffsetY: 0
@@ -94,7 +94,7 @@ ModelImporter:
       name: Ferretv2|Attack3
       takeName: Ferretv2|Attack3
       internalID: 574639498635716338
-      firstFrame: 0
+      firstFrame: 45
       lastFrame: 60
       wrapMode: 0
       orientationOffsetY: 0

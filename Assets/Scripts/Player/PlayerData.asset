@@ -15,8 +15,8 @@ MonoBehaviour:
   WalkSpeed: 5
   SprintSpeed: 10
   SprintLimit: 9
-  DodgeForce: 15
+  DodgeForce: 30
   DodgeCD: 3
-  AttackCD: 0
-  AttackSequence: 0.3
+  AttackCD: 1.5
+  AttackSequence: 0.5
   ComboBuffer: 0.2

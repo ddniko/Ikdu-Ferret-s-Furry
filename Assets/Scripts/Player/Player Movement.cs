@@ -26,6 +26,11 @@ public class PlayerMovement : MonoBehaviour
 
     private int AttackNum = 1;
 
+    private RaycastHit Point;
+
+    public GameObject Sword, Staff;
+
+
 
     void Start() //Setting objects from scene when starting
     {
@@ -46,16 +51,15 @@ public class PlayerMovement : MonoBehaviour
         Vertical = Input.GetAxis("Vertical"); //Returns 1 or -1 when pressing w or s
         MoveDir = new Vector3(Horizontal, 0, Vertical); //Makes vector from imput
 
-        if (MoveDir != Vector3.zero && !Dodging) //Makes the character rotate around the y-axis to look the direction it is walking.
+        if (MoveDir != Vector3.zero && !Dodging && !Attacking) //Makes the character rotate around the y-axis to look the direction it is walking.
         {
             transform.rotation = Quaternion.LookRotation(MoveDir, Vector3.up);
         }
 
         //Checks if you are making a movement input, this makes sure i don't walk and sprint at the same time
         Sprint = Input.GetKey(KeyCode.LeftShift) ? true : false; //These are simplified versions of if-statements where we have "Condition ? consequent : alternative" good for when a if-statement doesn't change much
-        Debug.Log(Sprint);
 
-        if (Input.GetKeyDown(KeyCode.Space) && DodgeTimer >= PlayerData.DodgeCD) //tilføj attack og sequence parameter og cooldown
+        if (Input.GetKeyDown(KeyCode.Space) && DodgeTimer >= PlayerData.DodgeCD && !Attacking) //tilføj attack og sequence parameter og cooldown
         {
             StartCoroutine(DodgeRoll());
         }
@@ -70,77 +74,27 @@ public class PlayerMovement : MonoBehaviour
                 if (hit.collider.gameObject.layer == 6)
                 {
                     //Debug.Log("Hit Ground");
-                    transform.rotation = Quaternion.LookRotation(hit.point, Vector3.up); // Endnu en parameter
-                    SequenceTimer = -PlayerData.AttackSequence; //CHANGE
+                    SequenceTimer = 0;
+                    //transform.rotation = Quaternion.LookRotation(hit.point, Vector3.up); // Endnu en parameter
+                    Point = hit;
+                    if (AttackTimer >= PlayerData.AttackCD)
+                    {
+                        Attack();
+                        AttackTimer = 0;
+                    }
                 }
             }
         }
-        /*
-        if (SequenceTimer < PlayerData.AttackSequence && WhatAttack(AttackNum) && !Dodging)
+
+        if (SequenceTimer >= PlayerData.AttackSequence && Animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.95)
         {
-            if (AttackNum == 1)
-            {
-                Debug.Log("attack1");
-                Animator.SetBool("Atk" + AttackNum, true);
-            }
-            else
-            {
-                Debug.Log("attack" + AttackNum);
-                Animator.SetBool("Atk" + AttackNum, true);
-                Animator.SetBool("Atk" + (AttackNum - 1), false);
-            }
-            AttackNum++;
-            //AttackNum = Mathf.Clamp(AttackNum,1,3);
-            Debug.Log(AttackNum);
-        }
-        else if (SequenceTimer > PlayerData.AttackSequence || AttackNum >= 4) //CHANGE den gør ikke attack 3
-        {
-            AttackNum = 1;
-            Animator.SetBool("Atk1",false);
-            Animator.SetBool("Atk2", false);
-            Animator.SetBool("Atk3", false);
-        }*/
-        /*
-        if (SequenceTimer <= 0 && !IsAttacking())
-        {
-            Attack();
+            Animator.SetBool("Attacking", false);
+            Attacking = false;
         }
 
-        if (IsAttacking() && Animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 0.7)
-        {
-            ComboBuffer = -PlayerData.ComboBuffer;
-        }
-
-        if (!IsAttacking() && ComboBuffer <= 0)
-        {
-            Animator.SetBool("Atk" + AttackNum, false);
-            AttackNum = 1;
-        }*/
-
-        if (SequenceTimer <= 0 && !Dodging)
-        {
-            Attack();
-            Animator.SetBool("Atk1", true);
-            Animator.SetBool("Atk2", false);
-            Animator.SetBool("Atk3", false);
-        }
-        else if (SequenceTimer <= 0 && !Dodging && Animator.GetCurrentAnimatorStateInfo(0).IsName("Attack1"))
-        {
-            Attack();
-            Animator.SetBool("Atk2", true);
-            Animator.SetBool("Atk1", false);
-            Animator.SetBool("Atk3", false);
-        }
-        else if (SequenceTimer <= 0 && !Dodging && Animator.GetCurrentAnimatorStateInfo(0).IsName("Attack2"))
-        {
-            Attack();
-            Animator.SetBool("Atk3", true);
-            Animator.SetBool("Atk2", false);
-            Animator.SetBool("Atk1", false);
-        }
 
         //Måske læg i script for sig selv
-        if (rb.velocity.magnitude >= 0.1 && rb.velocity.magnitude < PlayerData.SprintLimit)
+        if (rb.velocity.magnitude >= 0.2 && rb.velocity.magnitude < PlayerData.SprintLimit)
         {
             Walking = true;
             Sprinting = false;
@@ -161,13 +115,11 @@ public class PlayerMovement : MonoBehaviour
             Animator.SetBool("Walking", Walking);
             Animator.SetBool("Running", Sprinting);
         }
-
-        Debug.Log("IsAttacking" + IsAttacking());
     }
     
     private void FixedUpdate() //Everything doing something to a rigidbody, make do it in fixed
     {
-        if (!Dodging)
+        if (!Dodging && !Attacking)
         {
             if (Sprint) //Gives rigidbody velocity in vector direction and some speed multiplier, different when walking or sprinting
             {
@@ -196,58 +148,11 @@ public class PlayerMovement : MonoBehaviour
         Animator.SetBool("Dodging", Dodging);
         Debug.Log("Rolling end");
     }
-
-    private bool WhatAttack(int Num)
-    {
-        if (Num == 1)
-        {
-            return true;
-        }
-        else
-        {
-            if (Animator.GetCurrentAnimatorStateInfo(0).IsName("Attack" + (Num-1)) && Animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 0.7f)
-            {
-                Debug.Log("what attack true");
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-    }
-
-    private bool IsAttacking()
-    {
-        if (Animator.GetCurrentAnimatorStateInfo(0).IsName("Attack1") || Animator.GetCurrentAnimatorStateInfo(0).IsName("Attack2") || Animator.GetCurrentAnimatorStateInfo(0).IsName("Attack3"))
-        {
-            /*if (Animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 0.7f)
-            {
-                return false;
-            }*/
-            return true;
-        }
-        return false;
-    }
-
     private void Attack()
     {
-        SequenceTimer = 1;
-        if (AttackNum == 3)
-        {
-            Animator.SetBool("Atk" + AttackNum, true);
-            Animator.SetBool("Atk" + (AttackNum - 1), false);
-            AttackNum = 1;
-        }
-        else
-        {
-            Animator.SetBool("Atk" + AttackNum, true);
-            if (AttackNum == 2)
-            {
-                Animator.SetBool("Atk" + (AttackNum - 1), false);
-            }
-            AttackNum++;
-        }
+        transform.rotation = Quaternion.LookRotation(Point.point, Vector3.up);
+        Animator.SetBool("Attacking", true);
+        Attacking = true;
     }
 
 
@@ -360,4 +265,70 @@ public class PlayerMovement : MonoBehaviour
         }
     }
     */
+
+    /*
+if (SequenceTimer < PlayerData.AttackSequence && WhatAttack(AttackNum) && !Dodging)
+{
+    if (AttackNum == 1)
+    {
+        Debug.Log("attack1");
+        Animator.SetBool("Atk" + AttackNum, true);
+    }
+    else
+    {
+        Debug.Log("attack" + AttackNum);
+        Animator.SetBool("Atk" + AttackNum, true);
+        Animator.SetBool("Atk" + (AttackNum - 1), false);
+    }
+    AttackNum++;
+    //AttackNum = Mathf.Clamp(AttackNum,1,3);
+    Debug.Log(AttackNum);
+}
+else if (SequenceTimer > PlayerData.AttackSequence || AttackNum >= 4) //CHANGE den gør ikke attack 3
+{
+    AttackNum = 1;
+    Animator.SetBool("Atk1",false);
+    Animator.SetBool("Atk2", false);
+    Animator.SetBool("Atk3", false);
+}*/
+    /*
+    if (SequenceTimer <= 0 && !IsAttacking())
+    {
+        Attack();
+    }
+
+    if (IsAttacking() && Animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 0.7)
+    {
+        ComboBuffer = -PlayerData.ComboBuffer;
+    }
+
+    if (!IsAttacking() && ComboBuffer <= 0)
+    {
+        Animator.SetBool("Atk" + AttackNum, false);
+        AttackNum = 1;
+    }*/
+
+    /*
+//attack animation logic
+if (SequenceTimer <= 0 && !Dodging)
+{
+    Attack();
+    Animator.SetBool("Atk1", true);
+    Animator.SetBool("Atk2", false);
+    Animator.SetBool("Atk3", false);
+}
+else if (SequenceTimer <= 0 && !Dodging && Animator.GetCurrentAnimatorStateInfo(0).IsName("Attack1"))
+{
+    Attack();
+    Animator.SetBool("Atk2", true);
+    Animator.SetBool("Atk1", false);
+    Animator.SetBool("Atk3", false);
+}
+else if (SequenceTimer <= 0 && !Dodging && Animator.GetCurrentAnimatorStateInfo(0).IsName("Attack2"))
+{
+    Attack();
+    Animator.SetBool("Atk3", true);
+    Animator.SetBool("Atk2", false);
+    Animator.SetBool("Atk1", false);
+}*/
 }
