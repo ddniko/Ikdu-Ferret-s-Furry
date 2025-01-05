@@ -31,12 +31,14 @@ public class PlayerMovement : MonoBehaviour
     public GameObject Sword, Staff;
 
     public LayerMask Ground;
+    private Collider SwordCol;
 
 
     void Start() //Setting objects from scene when starting
     {
         rb = GetComponent<Rigidbody>();
         Animator = GetComponent<Animator>();
+        SwordCol = Sword.GetComponent<Collider>();
     }
 
 
@@ -83,10 +85,11 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        if (SequenceTimer >= PlayerData.AttackSequence && Animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.95)
+        if (SequenceTimer >= PlayerData.AttackSequence && Animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.95 || Animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.95 && Animator.GetCurrentAnimatorStateInfo(0).IsName("Attack3"))
         {
             Animator.SetBool("Attacking", false);
             Attacking = false;
+            SwordCol.enabled = false;
         }
 
 
@@ -151,6 +154,7 @@ public class PlayerMovement : MonoBehaviour
         Animator.SetBool("Attacking", true);
         rb.velocity = Vector3.zero;
         Attacking = true;
+        SwordCol.enabled = true;
     }
 
 
