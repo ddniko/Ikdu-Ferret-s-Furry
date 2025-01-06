@@ -24,8 +24,6 @@ public class PlayerMovement : MonoBehaviour
 
     public PlayerData PlayerData; //Reference to scriptable object
 
-    private int AttackNum = 1;
-
     private RaycastHit Point;
 
     public GameObject Sword, Staff;
@@ -33,12 +31,19 @@ public class PlayerMovement : MonoBehaviour
     public LayerMask Ground;
     private Collider SwordCol;
 
+    private Material[] OriginalMaterial;
+    public Material[] HitFlash;
+    private SkinnedMeshRenderer Mesh;
+    public GameObject ChildMesh;
 
-    void Start() //Setting objects from scene when starting
+
+    void Awake() //Setting objects from scene when starting
     {
         rb = GetComponent<Rigidbody>();
         Animator = GetComponent<Animator>();
         SwordCol = Sword.GetComponent<Collider>();
+        Mesh = ChildMesh.GetComponent<SkinnedMeshRenderer>();
+        OriginalMaterial = Mesh.materials;
     }
 
 
@@ -143,7 +148,7 @@ public class PlayerMovement : MonoBehaviour
         //something dont take damage
 
         rb.AddForce(transform.forward * PlayerData.DodgeForce, ForceMode.Impulse); //Pushes the character TO BE REMADE WHEN ANIMATION IS DONE
-        yield return new WaitForSeconds(1.458f);//set time to however long the animation takes
+        yield return new WaitForSeconds(1.215f);//set time to however long the animation takes
         Dodging = false;
         Animator.SetBool("Dodging", Dodging);
         Debug.Log("Rolling end");
@@ -157,7 +162,21 @@ public class PlayerMovement : MonoBehaviour
         SwordCol.enabled = true;
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "Enemy")
+        {
+            StartCoroutine(DamageFlash());
 
+        }
+    }
+
+    IEnumerator DamageFlash()
+    {
+        Mesh.materials = HitFlash;
+        yield return new WaitForSeconds(.2f);
+        Mesh.materials = OriginalMaterial;
+    }
 
 
 

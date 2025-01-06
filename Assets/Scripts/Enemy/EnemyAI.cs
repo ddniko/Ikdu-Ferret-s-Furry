@@ -22,11 +22,20 @@ public class NewBehaviourScript : MonoBehaviour
     public float SightRange, AttackRange;
     public bool PlayerInSight, PlayerInAttack;
 
+    private Rigidbody RB;
+
+    private Animator Animator;
+
+
 
     void Awake()
     {
         Player = GameObject.Find("Player").transform;
         Agent = GetComponent<NavMeshAgent>();
+        Animator = GetComponent<Animator>();
+        Animator.SetBool("Walking", true);
+        RB = GetComponent<Rigidbody>();
+
     }
     void Update()
     {
@@ -36,10 +45,13 @@ public class NewBehaviourScript : MonoBehaviour
         if (!PlayerInSight && !PlayerInAttack) Patroling();
         if (PlayerInSight && !PlayerInAttack) ChasePlayer();
         if (PlayerInSight && PlayerInAttack) AttackPlayer();
+        if (Attacked) RB.velocity = Vector3.zero;
     }
 
     private void Patroling()
     {
+        Animator.SetBool("Walking", true);
+        Animator.SetBool("Attacking", false);
         Debug.Log("patroling");
         if (!CenterpointSet) SearchWalkPoints();
 
@@ -63,30 +75,27 @@ public class NewBehaviourScript : MonoBehaviour
         {
             CenterpointSet = true;
         }
-        else
-        {
-            //Debug.Log("cantfindground");
-        }
     }
 
     private void ChasePlayer()
     {
+        Animator.SetBool("Walking", true);
+        Animator.SetBool("Attacking", false);
         Agent.SetDestination(Player.position);
-        //Debug.Log("chasing");
     }
 
     private void AttackPlayer()
     {
+        Animator.SetBool("Walking", true);
+        Animator.SetBool("Attacking", false);
         Agent.SetDestination(transform.position);
 
-        transform.LookAt(Player);
-        //Debug.Log("attacking");
         if (!Attacked)
         {
+            Animator.SetBool("Walking", false);
+            Animator.SetBool("Attacking", true);
 
-
-            //kør attack metode her.
-
+            StartCoroutine(Attack());
 
             //Debug.Log("didattack");
             Attacked = true;
@@ -99,6 +108,19 @@ public class NewBehaviourScript : MonoBehaviour
         Attacked = false; 
     }
 
+    IEnumerator Attack()
+    {
+        transform.LookAt(Player);
+        yield return new WaitForSeconds(.3f);
+        Debug.Log("Attack");
+
+        //kør attack her
+
+        RB.AddForce(transform.forward * 10, ForceMode.Impulse);
+        yield return new WaitForSeconds(1);
+        RB.velocity = Vector3.zero;
+    }
+
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.green;
@@ -107,7 +129,6 @@ public class NewBehaviourScript : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, PatrolRange);
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(Centerpoint, 10);
-
     }
 
 }
