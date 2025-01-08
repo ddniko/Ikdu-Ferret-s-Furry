@@ -9,7 +9,7 @@ public class BreakPot : MonoBehaviour
     private Collider Collider;
     private float OpacityTimer = 3;
     public Material[] PotMats;
-    public MeshRenderer[] Shards;
+    private MeshRenderer[] Shards;
 
     private void Awake()
     {
