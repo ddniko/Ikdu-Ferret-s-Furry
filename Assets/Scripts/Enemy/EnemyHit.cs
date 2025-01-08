@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class EnemyHP : MonoBehaviour
 {
-
+    public GameObject Player;
     public float HP = 5;
     private Material[] OriginalMaterial;
     public Material[] HitFlash;
@@ -31,6 +31,7 @@ public class EnemyHP : MonoBehaviour
         {
             Debug.Log("Hit");
             HP--;
+            Player.GetComponent<PlayerMovement>().RegenMP();
             StartCoroutine(Hit());
         }
     }

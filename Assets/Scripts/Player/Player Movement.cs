@@ -4,6 +4,7 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEditor.Animations;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -17,7 +18,6 @@ public class PlayerMovement : MonoBehaviour
     private float AttackTimer;
     private float SequenceTimer;
     private float DodgeTimer;
-    private float ComboBuffer;
 
     private Animator Animator;
     public bool Walking, Sprinting, Jumping, Grounded, Dodging, Attacking, Sequence; 
@@ -27,15 +27,23 @@ public class PlayerMovement : MonoBehaviour
     private RaycastHit Point;
 
     public GameObject Sword, Staff;
+    public GameObject SpellPrefab;
+    public Transform SpellSpawn;
+    private bool Magic;
 
     public LayerMask Ground;
     private Collider SwordCol;
 
+    public Material HitFlashMat;
     private Material[] OriginalMaterial;
-    public Material[] HitFlash;
     private SkinnedMeshRenderer Mesh;
     public GameObject ChildMesh;
 
+    private PauseMenu PauseMenu;
+
+    public int HP = 6;
+    public int MP = 2;
+    private int MPRegen;
 
     void Awake() //Setting objects from scene when starting
     {
@@ -44,6 +52,7 @@ public class PlayerMovement : MonoBehaviour
         SwordCol = Sword.GetComponent<Collider>();
         Mesh = ChildMesh.GetComponent<SkinnedMeshRenderer>();
         OriginalMaterial = Mesh.materials;
+        PauseMenu = GetComponent<PauseMenu>();
     }
 
 
@@ -53,13 +62,12 @@ public class PlayerMovement : MonoBehaviour
         DodgeTimer += Time.deltaTime;
         AttackTimer += Time.deltaTime;
         SequenceTimer += Time.deltaTime;
-        ComboBuffer += Time.deltaTime;
 
         Horizontal = Input.GetAxis("Horizontal"); //Returns 1 or -1 when pressing a or d
         Vertical = Input.GetAxis("Vertical"); //Returns 1 or -1 when pressing w or s
         MoveDir = new Vector3(Horizontal, 0, Vertical); //Makes vector from imput
 
-        if (MoveDir != Vector3.zero && !Dodging && !Attacking) //Makes the character rotate around the y-axis to look the direction it is walking.
+        if (MoveDir != Vector3.zero && !Dodging && !Attacking && !Magic) //Makes the character rotate around the y-axis to look the direction it is walking.
         {
             transform.rotation = Quaternion.LookRotation(MoveDir, Vector3.up);
         }
@@ -67,12 +75,12 @@ public class PlayerMovement : MonoBehaviour
         //Checks if you are making a movement input, this makes sure i don't walk and sprint at the same time
         Sprint = Input.GetKey(KeyCode.LeftShift) ? true : false; //These are simplified versions of if-statements where we have "Condition ? consequent : alternative" good for when a if-statement doesn't change much
 
-        if (Input.GetKeyDown(KeyCode.Space) && DodgeTimer >= PlayerData.DodgeCD && !Attacking) //tilføj attack og sequence parameter og cooldown
+        if (Input.GetKeyDown(KeyCode.Space) && DodgeTimer >= PlayerData.DodgeCD && !Attacking && !Magic) //tilføj attack og sequence parameter og cooldown
         {
             StartCoroutine(DodgeRoll());
         }
 
-        if (Input.GetMouseButtonDown(0) && !Dodging) //casts a ray when you L-click on screen space, and if the ray hits the ground, it makes a point, truning the character towards the point
+        if (Input.GetMouseButtonDown(0) && !Dodging && !PauseMenu.Paused && !Magic) //casts a ray when you L-click on screen space, and if the ray hits the ground, it makes a point, truning the character towards the point
         {
             //Debug.Log("Click");
             Ray MouseInput = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -85,6 +93,20 @@ public class PlayerMovement : MonoBehaviour
                 if (AttackTimer >= PlayerData.AttackCD)
                 {
                     Attack();
+                    AttackTimer = 0;
+                }
+            }
+        }
+
+        if (Input.GetMouseButtonDown(1) && !Dodging && !PauseMenu.Paused && MP > 1 && !Magic)
+        {
+            Ray MouseInput = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(MouseInput, out RaycastHit hit, Mathf.Infinity, Ground, QueryTriggerInteraction.Collide))
+            {
+                Point = hit;
+                if (AttackTimer >= PlayerData.AttackCD)
+                {
+                    StartCoroutine(MagicAttack());
                     AttackTimer = 0;
                 }
             }
@@ -120,11 +142,18 @@ public class PlayerMovement : MonoBehaviour
             Animator.SetBool("Walking", Walking);
             Animator.SetBool("Running", Sprinting);
         }
+
+
+        if (HP <= 0)
+        {
+            Destroy(gameObject);
+            SceneManager.LoadScene(2);
+        }
     }
     
     private void FixedUpdate() //Everything doing something to a rigidbody, make do it in fixed
     {
-        if (!Dodging && !Attacking)
+        if (!Dodging && !Attacking && !Magic)
         {
             if (Sprint) //Gives rigidbody velocity in vector direction and some speed multiplier, different when walking or sprinting
             {
@@ -162,20 +191,51 @@ public class PlayerMovement : MonoBehaviour
         SwordCol.enabled = true;
     }
 
+    IEnumerator MagicAttack()
+    {
+        MP--;
+        Magic = true;
+        Sword.SetActive(false);
+        Staff.SetActive(true);
+        Animator.SetBool("Magic", true);
+        transform.rotation = Quaternion.LookRotation(Point.point - transform.position, Vector3.up);
+        yield return new WaitForSeconds(.7f);
+        Instantiate(SpellPrefab, SpellSpawn.position, Quaternion.LookRotation(Point.point - transform.position, Vector3.up));
+        yield return new WaitForSeconds(.3f);
+        Magic = false;
+        Animator.SetBool("Magic", false);
+        Sword.SetActive(true);
+        Staff.SetActive(false);
+    }
+
     private void OnTriggerEnter(Collider other)
     {
-        if (other.tag == "Enemy")
+        if (other.tag == "EnemyAttack")
         {
             StartCoroutine(DamageFlash());
-
+            HP--;
         }
     }
 
     IEnumerator DamageFlash()
     {
+        Material[] HitFlash = new Material[OriginalMaterial.Length];
+        for (int i = 0; i < HitFlash.Length; i++)
+        {
+            HitFlash[i] = HitFlashMat;
+        }
         Mesh.materials = HitFlash;
         yield return new WaitForSeconds(.2f);
         Mesh.materials = OriginalMaterial;
+    }
+
+    public void RegenMP()
+    {
+        MPRegen++;
+        if (MPRegen % 3 == 0 && MP < 3)
+        {
+            MP++;
+        }
     }
 
 
@@ -184,6 +244,8 @@ public class PlayerMovement : MonoBehaviour
 
 
 
+
+    //Scrapped code
     /*
     private IEnumerator Attack1()
     {

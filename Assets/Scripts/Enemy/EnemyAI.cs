@@ -15,6 +15,7 @@ public class NewBehaviourScript : MonoBehaviour
     public Vector3 Centerpoint;
     private bool CenterpointSet;
     public float PatrolRange;
+    private float Speed;
 
     public float AttackCD;
     private bool Attacked;
@@ -26,6 +27,8 @@ public class NewBehaviourScript : MonoBehaviour
 
     private Animator Animator;
 
+    public Collider AttackZone;
+
 
 
     void Awake()
@@ -35,6 +38,7 @@ public class NewBehaviourScript : MonoBehaviour
         Animator = GetComponent<Animator>();
         Animator.SetBool("Walking", true);
         RB = GetComponent<Rigidbody>();
+        Speed = Agent.speed;
 
     }
     void Update()
@@ -44,8 +48,9 @@ public class NewBehaviourScript : MonoBehaviour
 
         if (!PlayerInSight && !PlayerInAttack) Patroling();
         if (PlayerInSight && !PlayerInAttack) ChasePlayer();
+        else Agent.speed = Speed;
         if (PlayerInSight && PlayerInAttack) AttackPlayer();
-        if (Attacked) RB.velocity = Vector3.zero;
+        if (!Attacked) RB.velocity = Vector3.zero;
     }
 
     private void Patroling()
@@ -82,6 +87,7 @@ public class NewBehaviourScript : MonoBehaviour
         Animator.SetBool("Walking", true);
         Animator.SetBool("Attacking", false);
         Agent.SetDestination(Player.position);
+        Agent.speed = Speed * 2;
     }
 
     private void AttackPlayer()
@@ -114,10 +120,10 @@ public class NewBehaviourScript : MonoBehaviour
         yield return new WaitForSeconds(.3f);
         Debug.Log("Attack");
 
-        //kør attack her
-
-        RB.AddForce(transform.forward * 10, ForceMode.Impulse);
+        AttackZone.enabled = true;
+        RB.AddForce(transform.forward * 20, ForceMode.Impulse);
         yield return new WaitForSeconds(1);
+        AttackZone.enabled = false;
         RB.velocity = Vector3.zero;
     }
 
