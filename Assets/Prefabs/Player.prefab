@@ -276,6 +276,22 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 5845939721453237733, guid: 6d50ec6f5957cd1459f7944e0310ed89, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.009374286
+      objectReference: {fileID: 0}
+    - target: {fileID: 5845939721453237733, guid: 6d50ec6f5957cd1459f7944e0310ed89, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.009374286
+      objectReference: {fileID: 0}
+    - target: {fileID: 5845939721453237733, guid: 6d50ec6f5957cd1459f7944e0310ed89, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.009374286
+      objectReference: {fileID: 0}
+    - target: {fileID: 5845939721453237733, guid: 6d50ec6f5957cd1459f7944e0310ed89, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6163569767821629660, guid: 6d50ec6f5957cd1459f7944e0310ed89, type: 3}
       propertyPath: m_Layer
       value: 7
@@ -481,6 +497,7 @@ MonoBehaviour:
   ChildMesh: {fileID: 7523286329346388864}
   HP: 6
   MP: 3
+  Canvas: {fileID: 0}
 --- !u!114 &552987271915262817
 MonoBehaviour:
   m_ObjectHideFlags: 0

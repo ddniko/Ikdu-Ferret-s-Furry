@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
-using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -44,6 +43,8 @@ public class PlayerMovement : MonoBehaviour
     public int HP = 6;
     public int MP = 2;
     private int MPRegen;
+
+    public GameObject Canvas;
 
     void Awake() //Setting objects from scene when starting
     {
@@ -147,7 +148,7 @@ public class PlayerMovement : MonoBehaviour
         if (HP <= 0)
         {
             Destroy(gameObject);
-            SceneManager.LoadScene(2);
+            Canvas.SetActive(true);
         }
     }
     

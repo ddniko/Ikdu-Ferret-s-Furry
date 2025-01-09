@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7008896251987665476}
   m_Layer: 0
   m_Name: AttackZone
-  m_TagString: Enemy
+  m_TagString: EnemyAttack
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -51,8 +51,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 0
   serializedVersion: 3
-  m_Size: {x: 7.4481764, y: 1, z: 3.9641314}
-  m_Center: {x: -0.030351639, y: 0, z: 1.4820657}
+  m_Size: {x: 6.3695884, y: 1, z: 3.1565733}
+  m_Center: {x: -0.008203268, y: 0, z: 1.0782866}
 --- !u!1001 &6539068650619783714
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -297,7 +297,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Player: {fileID: 0}
-  HP: 100
+  HP: 25
   HitFlash:
   - {fileID: 2100000, guid: d956ec7a9ab3ca34eabe1e87256a19b2, type: 2}
   - {fileID: 2100000, guid: d956ec7a9ab3ca34eabe1e87256a19b2, type: 2}
